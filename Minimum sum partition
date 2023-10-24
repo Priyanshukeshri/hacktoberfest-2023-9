@@ -1,0 +1,49 @@
+Given an array arr of size n containing non-negative integers, the task is to divide it into two sets S1 and S2 such that the absolute difference between their sums is minimum and find the minimum difference
+
+
+Example 1:
+
+Input: N = 4, arr[] = {1, 6, 11, 5} 
+Output: 1
+Explanation: 
+Subset1 = {1, 5, 6}, sum of Subset1 = 12 
+Subset2 = {11}, sum of Subset2 = 11   
+
+
+
+def findMinSubsetSumDifference(arr):
+    n = len(arr)
+    total_sum = sum(arr)
+
+    # Create a boolean table dp[i][j] where dp[i][j] is True if sum j can be achieved with the first i elements.
+    dp = [[False for _ in range(total_sum // 2 + 1)] for _ in range(n + 1)]
+
+    # Initialize the first column to True because sum 0 can always be achieved with an empty subset.
+    for i in range(n + 1):
+        dp[i][0] = True
+
+    for i in range(1, n + 1):
+        for j in range(1, total_sum // 2 + 1):
+            # If the current element is greater than the target sum, we cannot include it.
+            if arr[i - 1] > j:
+                dp[i][j] = dp[i - 1][j]
+            else:
+                # Otherwise, we have two choices: include the current element or exclude it.
+                dp[i][j] = dp[i - 1][j] or dp[i - 1][j - arr[i - 1]]
+
+    # Find the maximum sum achievable in the first half of the total sum.
+    max_sum_first_half = 0
+    for j in range(total_sum // 2, -1, -1):
+        if dp[n][j]:
+            max_sum_first_half = j
+            break
+
+    # Calculate the minimum absolute difference between total_sum and 2 * max_sum_first_half.
+    min_difference = total_sum - 2 * max_sum_first_half
+
+    return min_difference
+
+# Example usage:
+arr = [1, 6, 11, 5]
+result = findMinSubsetSumDifference(arr)
+print(result)  # Output: 1
